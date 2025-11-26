@@ -1,5 +1,6 @@
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { readFile } from "node:fs/promises";
+import generate from './utils'
 import fs from "fs";
 // const s3 = new S3Client({
 //     region: "auto",
@@ -10,6 +11,7 @@ import fs from "fs";
 //     endpoint: "https://e14b54367b12d91bc13b2d6d3e4dc94b.r2.cloudflarestorage.com"
 // })
 
+const Id=generate();
 export const uploadFile = async (fileName: string, localFilePath: string) => {
     const s3 = new S3Client({
         region: "auto",
@@ -19,11 +21,12 @@ export const uploadFile = async (fileName: string, localFilePath: string) => {
         },
         endpoint: "https://e14b54367b12d91bc13b2d6d3e4dc94b.r2.cloudflarestorage.com"
     })
-    // const fileContent = fs.readdirSync(localFilePath);
+    const remoteKey=`output/${fileName}`
+    const fileContent =  fs.readFileSync(localFilePath);
     const command = new PutObjectCommand({
         Bucket: "vercel",
-        Body: await readFile(localFilePath),
-        Key:fileName,
+        Body: fileContent,
+        Key:remoteKey,
     })
     const response = await s3.send(command);
     console.log(response);

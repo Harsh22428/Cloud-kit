@@ -9,7 +9,9 @@ import simpleGit from 'simple-git';
 import path from 'path';
 import { getAllFiles } from './file';
 import { uploadFile } from './aws';
-
+import { createClient } from 'redis';
+const publisher= createClient();
+publisher.connect();
 
 const app = express();
 app.use(cors());
@@ -33,7 +35,9 @@ app.post('/deploy', async (req, res) => {
     })
     // console.log(files)
 
-    // put this into s3
+    
+    publisher.lPush("build-queue",id);
+    
     res.json({
         id: id
     })
